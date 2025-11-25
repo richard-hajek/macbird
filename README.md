@@ -22,9 +22,13 @@ Thunderbird Email Client
 
 ## Quick Start
 
+This software is not yet on any package repository, please download it and use manualy.
+
 ### 1. Install Server Dependencies
 
 ```bash
+git clone https://github.com/richard-hajek/macbird.git
+cd macbird
 cd server
 bun install
 ```
