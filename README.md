@@ -1,5 +1,5 @@
 
-> [!WARNING] Security Notes
+> [!WARNING]
 > This server provides direct access to all of your configured Thunderbird accounts. Only use it with trusted AI assistants.
 
 # Thunderbird MCP Server
