@@ -3,34 +3,41 @@
 // Helper function to get all folders recursively for an account
 async function getAllFoldersForAccount(accountId) {
   const folders = [];
-  
-  async function traverse(folderId, includeSubFolders = true) {
-    try {
-      const folder = await browser.folders.get(folderId);
-      folders.push(folder);
-      
-      if (includeSubFolders) {
-        // Get subfolders by ID
-        const subFolders = await browser.folders.getSubFolders(folderId, false);
-        for (const subfolder of subFolders) {
-          await traverse(subfolder.id, true);
-        }
-      }
-    } catch (error) {
-      console.error(`Error accessing folder ${folderId}:`, error);
-    }
-  }
-  
-  // Get root folders for account
-  const account = await browser.accounts.get(accountId);
+  const account = await browser.accounts.get(accountId, true);
   if (account.rootFolder && account.rootFolder.id) {
-    const rootFolders = await browser.folders.getSubFolders(account.rootFolder.id, false);
-    for (const folder of rootFolders) {
-      await traverse(folder.id, true);
-    }
+      let exploring = [account.rootFolder];
+      while (exploring.length > 0) {
+          let folder = exploring.pop()
+          exploring.push(...folder.subFolders)
+          folders.push(...folder.subFolders)
+      }
   }
   
   return folders;
+}
+
+async function getAccountInboxFolders(accountId) {
+    let folders = await getAllFoldersForAccount(accountId);
+
+    console.log(`Pre filter for ${JSON.stringify(accountId)}: ${JSON.stringify(folders)}`)
+
+    return folders.filter((v) => {return v.name.toLowerCase().includes('inbox') || v.id.toLowerCase().includes('inbox')}).map((v) => {return v.id})
+}
+
+async function getAccountsInboxFolders(accountsIds){
+    let folders = [];
+
+    if (accountsIds === undefined) {
+      accountsIds = (await browser.accounts.list()).map(acc => (acc.id))
+    }
+
+    for (let acc of accountsIds) {
+        folders.push(...await getAccountInboxFolders(acc))
+    }
+
+    console.log(`Inboxes for ${JSON.stringify(accountsIds)}: ${JSON.stringify(folders)}`)
+
+    return folders
 }
 
 async function handleListAccounts(_payload) {
@@ -77,71 +84,49 @@ async function handleListFolders(payload) {
   };
 }
 
+function ToArray(x){
+  return Array.isArray(x) ? x : [x]
+}
+
 async function handleListUnreadEmails(payload) {
   const { accountId, folderId, limit = 50, includeSpam = false, afterDate } = payload || {};
-  const messages = [];
-  
-  // Parse afterDate if provided
-  const afterTimestamp = afterDate ? new Date(afterDate).getTime() : null;
-  
-  // Get accounts to search
-  const accounts = accountId 
-    ? [await browser.accounts.get(accountId)]
-    : await browser.accounts.list();
-  
-  for (const account of accounts) {
-    let folders;
-    
-    if (folderId) {
-      // Get specific folder
-      folders = [await browser.folders.get(folderId)];
-    } else {
-      // Get all folders for the account
-      folders = await getAllFoldersForAccount(account.id);
+  const queryObj = {
+    read: false,
+    messagesPerPage: 100,
+    junk: includeSpam,
+    fromDate: afterDate ? new Date(afterDate) : undefined,
+    accountId: accountId ? ToArray(accountId) : undefined,
+    folderId: folderId ? ToArray(folderId) : await getAccountsInboxFolders(accountId),
+  };
+
+  console.log('[MCP] Querying unread messages with:', queryObj);
+
+  let {id, messages} = (await browser.messages.query(queryObj));
+
+  while (true){
+
+    if (messages.length === 0 || ! id) {
+      break;
     }
-      
-    for (const folder of folders) {
-      // Skip spam/junk/newsletter folders unless includeSpam is true
-      if (!includeSpam) {
-        const isSpamFolder = folder.type === 'junk' || 
-                             folder.name.toLowerCase() === 'spam' ||
-                             folder.name.toLowerCase() === 'junk' ||
-                             folder.name.toLowerCase() === 'newsletters' ||
-                             folder.path.toLowerCase().includes('/spam') ||
-                             folder.path.toLowerCase().includes('/junk') ||
-                             folder.path.toLowerCase().includes('/newsletters') ||
-                             (folder.specialUse && folder.specialUse.includes('junk'));
-        
-        if (isSpamFolder) {
-          continue;
-        }
-      }
-      
-      try {
-        const page = await browser.messages.list(folder.id);
-        for (const message of page.messages) {
-          if (!message.read) {
-            // Filter by date if afterDate is provided
-            if (afterTimestamp) {
-              const messageTimestamp = new Date(message.date).getTime();
-              if (messageTimestamp <= afterTimestamp) {
-                continue;
-              }
-            }
-            
-            messages.push(message);
-            if (messages.length >= limit) break;
-          }
-        }
-        if (messages.length >= limit) break;
-      } catch (error) {
-        console.error(`Error listing messages in folder ${folder.id}:`, error);
-      }
+
+    let nextPage = await browser.messages.continueList(id);
+    messages.push(...(nextPage.messages));
+
+    if (nextPage.messages.length === 0) {
+      break;
     }
-    if (messages.length >= limit) break;
   }
-  
-  return { success: true, messages, count: messages.length };
+
+  if (id) {
+   await browser.messages.abortList(id);
+  }
+
+  console.log('[MCP] Found', messages.length, 'unread messages');
+
+  return {
+    success: true,
+    messages: messages.slice(0, limit),
+  };
 }
 
 async function handleSearchEmails(payload) {

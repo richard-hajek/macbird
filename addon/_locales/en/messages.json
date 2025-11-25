@@ -1,8 +1,8 @@
 {
   "extensionDescription": {
-    "message": "A sample addon that lists all available WebExtension APIs"
+    "message": "An addon that allows connecting of your AI agents"
   },
   "extensionName": {
-    "message": "API List Example"
+    "message": "MCPMacBird"
   }
 }

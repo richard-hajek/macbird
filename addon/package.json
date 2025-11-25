@@ -4,7 +4,8 @@
   "description": "Thunderbird WebExtension for MCP Server",
   "scripts": {
     "lint": "eslint *.js",
-    "lint:fix": "eslint *.js --fix"
+    "lint:fix": "eslint *.js --fix",
+    "build": "mkdir -p dist && rm dist/package.zip && atool -a dist/package.zip *.js *.json _locales/**/*"
   },
   "devDependencies": {
     "eslint": "^8.57.0"

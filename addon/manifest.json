@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
   "version": "1.0",
-  "author": "Thunderbird Team",
+  "author": "Richard Hajek",
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
   "browser_specific_settings": {
     "gecko": {
-      "id": "apiList@mv3.sample.extensions.thunderbird.net",
+      "id": "macbird@meowxiik.com",
       "strict_min_version": "128.0"
     }
   },
@@ -15,15 +15,6 @@
       "background_handlers.js",
       "background.js"
     ]
-  },
-  "cloud_file": {
-    "name": "__MSG_extensionName__",
-    "management_url": "apis.html"
-  },
-  "options_ui": {
-    "page": "apis.html",
-    "open_in_tab": true,
-    "browser_style": true
   },
   "permissions": [
     "accountsFolders",

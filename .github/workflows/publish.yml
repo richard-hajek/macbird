@@ -1,0 +1,57 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: |
+          cd server && bun install
+          cd ../addon && bun install
+      
+      - name: Run linters
+        run: |
+          cd server && bun run lint
+          cd ../addon && bun run lint
+      
+      - name: Run type checking
+        run: cd server && bun run typecheck
+      
+      - name: Build server
+        run: cd server && bun run build
+      
+      - name: Build addon .xpi
+        run: cd addon && bun run build
+      
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/thunderbird-mcp-addon-v${{ steps.get_version.outputs.VERSION }}.xpi
+            server/dist/server.js
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
