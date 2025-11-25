@@ -1,3 +1,7 @@
+
+> [!WARNING] Security Notes
+> This server provides direct access to all of your configured Thunderbird accounts. Only use it with trusted AI assistants.
+
 # Thunderbird MCP Server
 
 A Model Context Protocol (MCP) server that provides AI assistants with access to Thunderbird email functionality through a WebSocket connection to a Thunderbird extension.
@@ -304,10 +308,6 @@ The server logs to stderr (visible in MCP client logs). The addon logs to the Th
 - The search has a 25-second timeout in the extension
 - Try being more specific with your search query
 - Use `list_unread_emails` instead for simpler queries
-
-## Security Notes
-
-This server provides direct access to your email. Only use it with trusted AI assistants and on secure networks. The WebSocket server only accepts connections from localhost by default.
 
 ## Port Configuration
 
