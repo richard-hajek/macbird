@@ -1,0 +1,46 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "webextensions": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "script"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { 
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_"
+    }],
+    "no-console": "off"
+  },
+  "globals": {
+    "browser": "readonly",
+    "TurndownService": "readonly"
+  },
+  "overrides": [
+    {
+      "files": ["background.js"],
+      "globals": {
+        "getAllFoldersForAccount": "readonly",
+        "handleListAccounts": "readonly",
+        "handleListFolders": "readonly",
+        "handleListUnreadEmails": "readonly",
+        "handleSearchEmails": "readonly",
+        "handleReadEmailRaw": "readonly",
+        "handleReadEmail": "readonly",
+        "handleSendEmail": "readonly",
+        "handleReadEmailAttachments": "readonly",
+        "handleDownloadAttachment": "readonly"
+      }
+    },
+    {
+      "files": ["background_handlers.js"],
+      "rules": {
+        "no-unused-vars": "off"
+      }
+    }
+  ]
+}

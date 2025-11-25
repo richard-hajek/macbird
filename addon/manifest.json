@@ -1,0 +1,86 @@
+{
+  "manifest_version": 3,
+  "version": "1.0",
+  "author": "Thunderbird Team",
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "apiList@mv3.sample.extensions.thunderbird.net",
+      "strict_min_version": "128.0"
+    }
+  },
+  "background": {
+    "scripts": [
+      "background_handlers.js",
+      "background.js"
+    ]
+  },
+  "cloud_file": {
+    "name": "__MSG_extensionName__",
+    "management_url": "apis.html"
+  },
+  "options_ui": {
+    "page": "apis.html",
+    "open_in_tab": true,
+    "browser_style": true
+  },
+  "permissions": [
+    "accountsFolders",
+    "accountsRead",
+    "activeTab",
+    "addressBooks",
+    "alarms",
+    "browserSettings",
+    "clipboardRead",
+    "clipboardWrite",
+    "compose",
+    "contextualIdentities",
+    "cookies",
+    "dns",
+    "downloads",
+    "downloads.open",
+    "geolocation",
+    "idle",
+    "management",
+    "menus",
+    "menus.overrideContext",
+    "messagesMove",
+    "messagesRead",
+    "nativeMessaging",
+    "notifications",
+    "pkcs11",
+    "privacy",
+    "proxy",
+    "storage",
+    "scripting",
+    "tabs",
+    "theme",
+    "unlimitedStorage",
+    "webNavigation",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "action": {
+    "default_title": "__MSG_extensionName__"
+  },
+  "compose_action": {
+    "default_title": "__MSG_extensionName__"
+  },
+  "message_display_action": {
+    "default_title": "__MSG_extensionName__"
+  },
+  "commands": {
+    "toggle-feature": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "linux": "Ctrl+Shift+U"
+      },
+      "description": "Send a 'toggle-feature' event"
+    }
+  },
+  "default_locale": "en",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src ws://localhost:37842 http://localhost:37842"
+  }
+}

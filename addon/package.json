@@ -1,0 +1,12 @@
+{
+  "name": "thunderbird-mcp-addon",
+  "version": "1.0.0",
+  "description": "Thunderbird WebExtension for MCP Server",
+  "scripts": {
+    "lint": "eslint *.js",
+    "lint:fix": "eslint *.js --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}
